@@ -35,7 +35,8 @@ def x_partition(cities):
             raise Exception()
     return part1, part2
 
-
+comps = []
+non_comps = []
 
 def stitch(subsol0, subsol1, endpoints0, endpoints1, top_endpoints):
     closest_pair_0 = None
@@ -68,8 +69,29 @@ def stitch(subsol0, subsol1, endpoints0, endpoints1, top_endpoints):
                         res.append((s0[0], s1[1], dist, path))
     #print(res)
     if len(res) == 0:
-        pass
-    return res
+        print("compensating")
+        comps.append(len(top_endpoints))
+        top_endpoints = set()
+        for s0 in subsol0[:3]:
+            for s1 in subsol1[:3]:
+                #if s0[0] in top_endpoints and s1[1] in top_endpoints:
+                        dist = s0[2] + length(s0[1], s1[0]) + s1[2]
+                        path = s0[3] + s1[3]
+                        top_endpoints.add(s0[0])
+                        top_endpoints.add(s1[1])
+                        res.append((s0[0], s1[1], dist, path))
+                        res.append((s1[1], s0[0], dist, list(reversed(path))))
+        top_endpoints = list(top_endpoints)
+        print("done compensating")
+    else:
+        non_comps.append(len(top_endpoints))
+
+    if len(res) == 0:
+        print("failed")
+        print(subsol0)
+        print(subsol1)
+        raise Exception("failed to compensate")
+    return res, top_endpoints
 
 
 
@@ -94,15 +116,18 @@ def recursive_split(cities):
     top_endpoints = get_endpoints(endpoints0+endpoints1, math.sqrt(len(cities)))
     print("top endpoints", len(top_endpoints), top_endpoints)
 
-    sol = stitch(subsol0, subsol1, endpoints0, endpoints1, top_endpoints)
-    return sol, top_endpoints
+    return stitch(subsol0, subsol1, endpoints0, endpoints1, top_endpoints)
+    #return sol, top_endpoints
 
-cities = gen_cities_annotated(32,500)
+cities = gen_cities_annotated(10000,500)
 print("=" * 100)
 
 rec_sols, endpoints = recursive_split(cities)
 res_rec = best_closed_sol(rec_sols)
-print("rec", total_distance(cities, res_rec[1]), res_rec)
+print("rec", res_rec, total_distance(cities, res_rec[1]))
+
+print(comps)
+print(len(comps), len(non_comps))
 
 # res_held = solve_tsp_dynamic(cities)
 # print("held", total_distance(cities, res_held[1]), res_held)
