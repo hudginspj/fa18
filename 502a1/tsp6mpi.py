@@ -133,7 +133,7 @@ def recursive_split(cities, depth=0):
 
     if depth <= SPLIT_DEPTH:
         data = {'a': 7, 'b': 3.14}
-        sub_rank = rank + int(math.pow(2, depth)
+        sub_rank = rank + int(math.pow(2, depth))
         comm.send((part0, depth+1), dest=sub_rank, tag=11)
         # parent_conn_0, child_conn_0 = Pipe()
         # p0 = Process(target=recursive_split_process, args=(part0, depth+1, child_conn_0))
