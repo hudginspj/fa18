@@ -131,7 +131,7 @@ def recursive_split(cities, depth=0):
     else:
         part0, part1 = y_partition(cities)
 
-    if depth <= 1:
+    if depth <= SPLIT_DEPTH:
         data = {'a': 7, 'b': 3.14}
         sub_rank = rank + int(math.pow(2, depth)
         comm.send((part0, depth+1), dest=sub_rank, tag=11)
@@ -156,21 +156,40 @@ def recursive_split(cities, depth=0):
 
     return stitch(subsol0, subsol1, endpoints0, endpoints1, top_endpoints)
 
+def mpi_tsp(cities):
+    rec_sols, endpoints = recursive_split(cities)
+    res_rec = best_closed_sol(rec_sols)
+    return res_rec[1]
+
+def mpi_trial(n):
+    cities = gen_cities_annotated(n,500)
+
+    start_time = datetime.datetime.now()
+    path = mpi_tsp(cities)
+    runtime = (datetime.datetime.now() - start_time).total_seconds()
+    
+    distance = total_distance(cities, path)
+    return n, runtime, distance
+
+SPLIT_DEPTH = 4
 if rank != 0:
     recursive_split_MPI()
 else:
+    n, runtime, distance = mpi_trial(1000)
+    print(SPLIT_DEPTH, n, runtime, distance)
+    
 #if __name__ == "__main__":
-    start_time = datetime.datetime.now()
+    # start_time = datetime.datetime.now()
 
-    cities = gen_cities_annotated(1000,500)
-    print("=" * 100)
+    # cities = gen_cities_annotated(1000,500)
+    # print("=" * 100)
 
-    rec_sols, endpoints = recursive_split(cities)
-    res_rec = best_closed_sol(rec_sols)
-    #print("rec", res_rec)
-    print("length:", total_distance(cities, res_rec[1]))
+    # rec_sols, endpoints = recursive_split(cities)
+    # res_rec = best_closed_sol(rec_sols)
+    # #print("rec", res_rec)
+    # print("length:", total_distance(cities, res_rec[1]))
 
-    stop_time = datetime.datetime.now()
-    print(stop_time - start_time)
+    # stop_time = datetime.datetime.now()
+    # print(stop_time - start_time)
 
 
