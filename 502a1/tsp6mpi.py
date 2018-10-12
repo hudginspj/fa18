@@ -121,7 +121,7 @@ def recursive_split_MPI():
     #conn.close()
 
 def recursive_split(cities, depth=0):
-    if len(cities) < 11:
+    if len(cities) <= BLOCK_SIZE:
         endpoints = get_endpoints(cities, math.sqrt(len(cities)))
         sol = best_between_endpoints_annotated(cities, endpoints) # Held-karp
         return sol, endpoints
@@ -172,11 +172,12 @@ def mpi_trial(n):
     distance = total_distance(cities, path)
     return n, runtime, distance
 
+BLOCK_SIZE = 10
 SPLIT_DEPTH = 4
 if rank != 0:
     recursive_split_MPI()
 else:
-    n, runtime, distance = mpi_trial(1000)
+    n, runtime, distance = mpi_trial(16384)
     print(SPLIT_DEPTH, n, runtime, distance)
     
 #if __name__ == "__main__":
