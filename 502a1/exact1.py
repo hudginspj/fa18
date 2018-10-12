@@ -155,5 +155,20 @@ def test_annotate():
     for x in min_paths:
         print(x)
     
-#test_annotate()
+
+
+def exact_tsp(cities):
+    rec_sols, endpoints = recursive_split(cities)
+    res_rec = best_closed_sol(rec_sols)
+    return res_rec[1]
+
+def exact_trial(n):
+    cities = gen_cities_annotated(n,500)
+
+    start_time = datetime.datetime.now()
+    path = threaded_tsp(cities)
+    runtime = (datetime.datetime.now() - start_time).total_seconds()
+    
+    distance = total_distance(cities, path)
+    return n, runtime, distance
 
