@@ -7,7 +7,7 @@ from exact1 import *
 from stitch import *
 from mpi4py import MPI
 
-print("hello")
+#print("hello")
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -152,7 +152,8 @@ def recursive_split(cities, depth=0):
     top_endpoints = get_endpoints(endpoints0+endpoints1, math.sqrt(len(cities)))
 
     if depth < 5:
-        print("  " * depth, len(cities), len(subsol0), len(subsol1), len(top_endpoints))
+        pass
+        #print("  " * depth, len(cities), len(subsol0), len(subsol1), len(top_endpoints))
 
     return stitch(subsol0, subsol1, endpoints0, endpoints1, top_endpoints)
 
