@@ -115,7 +115,7 @@ def best_from_start_annotated(points, start_point, endpoints):   ########### TOD
             calc_path = A[set_endpoint][1]
             path = [points[index][2] for index in calc_path]
             #print(calc_path, path)
-            res.append((endpoint, distance, path))
+            res.append((start_point, endpoint, distance, path))
 
     return res
     
@@ -124,7 +124,7 @@ def best_between_endpoints_annotated(points, endpoints):
     for i in range(len(endpoints)):
         start = endpoints[i]
         for solution in best_from_start_annotated(points, start, endpoints[:i] + endpoints[i+1:]):
-            res.append((start, solution[0], solution[1], solution[2]))
+            res.append(solution) #(start, solution[0], solution[1], solution[2]))
             #res.append((solution[0], start, solution[1], solution[2]))
     return res
 
@@ -160,7 +160,7 @@ def test_annotate():
 
 def exact_tsp(cities):
     exact_sols =  best_from_start_annotated(cities, cities[0], cities)
-    exact_sols = [[cities[0]]+list(sol) for sol in exact_sols]
+    #exact_sols = [[cities[0]]+list(sol) for sol in exact_sols]
     res_exact = best_closed_sol(exact_sols)
     return res_exact[1]
 

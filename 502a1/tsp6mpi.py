@@ -177,21 +177,9 @@ SPLIT_DEPTH = 4
 if rank != 0:
     recursive_split_MPI()
 else:
-    n, runtime, distance = mpi_trial(16384)
+    n, runtime, distance = mpi_trial(100000)
     print(SPLIT_DEPTH, n, runtime, distance)
     
-#if __name__ == "__main__":
-    # start_time = datetime.datetime.now()
 
-    # cities = gen_cities_annotated(1000,500)
-    # print("=" * 100)
-
-    # rec_sols, endpoints = recursive_split(cities)
-    # res_rec = best_closed_sol(rec_sols)
-    # #print("rec", res_rec)
-    # print("length:", total_distance(cities, res_rec[1]))
-
-    # stop_time = datetime.datetime.now()
-    # print(stop_time - start_time)
 
 

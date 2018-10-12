@@ -25,7 +25,7 @@ def recursive_split(cities, depth=0):
     else:
         part0, part1 = y_partition(cities)
 
-    if depth <= 1:
+    if depth <= 5:
         # parent_conn_0, child_conn_0 = Pipe()
         # p0 = Process(target=recursive_split_process, args=(part0, depth+1, child_conn_0))
         # parent_conn_1, child_conn_1 = Pipe()
