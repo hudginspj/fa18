@@ -26,29 +26,29 @@ def recursive_split(cities, depth=0):
         part0, part1 = y_partition(cities)
 
     if depth <= 1:
-        parent_conn_0, child_conn_0 = Pipe()
-        p0 = Process(target=recursive_split_process, args=(part0, depth+1, child_conn_0))
-        parent_conn_1, child_conn_1 = Pipe()
-        p1 = Process(target=recursive_split_process, args=(part1, depth+1, child_conn_1))
-
-        p0.start()
-        #time.sleep(3)
-        p1.start()
-
-        subsol0, endpoints0 = parent_conn_0.recv()
-        subsol1, endpoints1 = parent_conn_1.recv()
-        p0.join()
-        p1.join()
-
         # parent_conn_0, child_conn_0 = Pipe()
         # p0 = Process(target=recursive_split_process, args=(part0, depth+1, child_conn_0))
+        # parent_conn_1, child_conn_1 = Pipe()
+        # p1 = Process(target=recursive_split_process, args=(part1, depth+1, child_conn_1))
 
         # p0.start()
-
-        # subsol1, endpoints1 = recursive_split(part1, depth+1)
+        # #time.sleep(3)
+        # p1.start()
 
         # subsol0, endpoints0 = parent_conn_0.recv()
+        # subsol1, endpoints1 = parent_conn_1.recv()
         # p0.join()
+        # p1.join()
+
+        parent_conn_0, child_conn_0 = Pipe()
+        p0 = Process(target=recursive_split_process, args=(part0, depth+1, child_conn_0))
+
+        p0.start()
+
+        subsol1, endpoints1 = recursive_split(part1, depth+1)
+
+        subsol0, endpoints0 = parent_conn_0.recv()
+        p0.join()
         
     else:
         subsol0, endpoints0 = recursive_split(part0, depth+1)

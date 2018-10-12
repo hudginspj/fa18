@@ -1,6 +1,7 @@
 import random
 import math
 import itertools
+import datetime
 
 def gen_cities(n, max_xy):
     min_xy = max_xy / 200.0
@@ -158,17 +159,23 @@ def test_annotate():
 
 
 def exact_tsp(cities):
-    rec_sols, endpoints = recursive_split(cities)
-    res_rec = best_closed_sol(rec_sols)
-    return res_rec[1]
+    exact_sols =  best_from_start_annotated(cities, cities[0], cities)
+    exact_sols = [[cities[0]]+list(sol) for sol in exact_sols]
+    res_exact = best_closed_sol(exact_sols)
+    return res_exact[1]
 
 def exact_trial(n):
     cities = gen_cities_annotated(n,500)
 
     start_time = datetime.datetime.now()
-    path = threaded_tsp(cities)
+    path = exact_tsp(cities)
     runtime = (datetime.datetime.now() - start_time).total_seconds()
     
     distance = total_distance(cities, path)
     return n, runtime, distance
 
+
+
+if __name__ == "__main__":
+    print(exact_trial(12))
+    

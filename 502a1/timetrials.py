@@ -9,8 +9,9 @@ from tsp5threaded import *
 
 
 def time_trial():
-    for i in range(2,14):
-        print(threaded_trial(int(math.pow(2,i))))
+    sizes = [8,9,10,11,12,13,14,15,16,30,100,300,1000,3000,10000,30000,100000]
+    for s in sizes:
+        print(threaded_trial(s))
 
 
 if __name__ == "__main__":
