@@ -1,16 +1,14 @@
+#!/usr/bin/python3
 import random
 import math
 import itertools
+import sys
 import datetime
 
 
 def gen_cities(n, max_xy, threshold=float("inf")):
-    line = input().split()
-    cities = []
-    while len(line) == 2:
-        cities.append((float(line[0]), float(line[1])))
-        line = input().split()
-    return cities
+    lines = [line.split() for line in sys.stdin]
+    return [[float(line[0]), float(line[1])] for line in lines]
 
     min_xy = max_xy / 200.0
     def coord():
