@@ -4,39 +4,14 @@ import itertools
 import datetime
 
 
-def best_from_start_annotated(points, start_point, endpoints):   ########### TODO copied code, rewrite
-    points = points.copy()
+def gen_cities(n, max_xy, threshold=float("inf")):
+    line = input().split()
+    cities = []
+    while len(line) == 2:
+        cities.append((float(line[0]), float(line[1])))
+        line = input().split()
+    return cities
 
-    start = points.index(start_point)
-    points[0], points[start] = points[start], points[0]
-    
-    all_distances = [[length(x,y) for y in points] for x in points]
-    
-    #initial value - just distance from 0 to every other point + keep the track of edges
-    #{(S, endpoint):(distance, path)}
-    A = {(frozenset([0, idx+1]), idx+1): (dist, [0,idx+1]) for idx,dist in enumerate(all_distances[0][1:])}
-    cnt = len(points)
-    for m in range(2, cnt):
-        B = {}
-        for S in [frozenset(C) | {0} for C in itertools.combinations(range(1, cnt), m)]:
-            for j in S - {0}:
-                B[(S, j)] = min( [(A[(S-{j},k)][0] + all_distances[k][j], A[(S-{j},k)][1] + [j]) for k in S if k != 0 and k!=j])  #this will use 0th index of tuple for ordering, the same as if key=itemgetter(0) used
-        A = B
-    
-    res = []
-    endpoint_indexes = [points.index(ep) for ep in endpoints]
-    for set_endpoint in iter(A):
-        if set_endpoint[1] in endpoint_indexes:
-            endpoint = points[set_endpoint[1]]
-            distance = A[set_endpoint][0]
-            calc_path = A[set_endpoint][1]
-            path = [points[index][2] for index in calc_path]
-            #print(calc_path, path)
-            res.append((start_point, endpoint, distance, path))
-
-    return res
-
-def gen_cities(n, max_xy):
     min_xy = max_xy / 200.0
     def coord():
         return min_xy + random.uniform(min_xy, max_xy)
@@ -117,10 +92,6 @@ def total_distance(cities, path):
     return dist
     
 
-def ref_tsp(cities):
-    exact_sols =  best_from_start_annotated(cities, cities[0], cities)
-    res_exact = best_closed_sol(exact_sols)
-    return res_exact[1]
 
 def exact_tsp(cities):
     exact_sols =  held_karp_start_endpoints(cities, cities[0], cities)
@@ -132,12 +103,10 @@ def exact_trial(n):
 
     start_time = datetime.datetime.now()
     path = exact_tsp(cities)
-    path2 = ref_tsp(cities)
-    print("match", path == path2)
     runtime = (datetime.datetime.now() - start_time).total_seconds()
     
     distance = total_distance(cities, path)
-    return n, runtime, distance
+    return len(cities), runtime, distance
 
 
 
