@@ -178,7 +178,7 @@ if rank != 0:
     recursive_split_MPI()
 else:
     n, runtime, distance = mpi_trial(100000)
-    print(SPLIT_DEPTH, n, runtime, distance)
+    print((SPLIT_DEPTH, n, runtime, distance))
     
 
 
