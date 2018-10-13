@@ -4,5 +4,5 @@ python3 get-pip.py --user
 pip3 install --user mpi4py
 
 #Running single-threaded:
-mpiexec -n 4 python3 tsp.py
+mpiexec -n 4 python3 tsp6mpi.py
 
