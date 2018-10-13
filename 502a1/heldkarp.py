@@ -3,20 +3,25 @@ import random
 import math
 import itertools
 import sys
+import time
 import datetime
 
 
-def gen_cities(n, max_xy, threshold=float("inf")):
-    lines = [line.split() for line in sys.stdin]
-    return [[float(line[0]), float(line[1])] for line in lines]
+def read_cities(threshold=float("inf")):
+    lines = sys.stdin.readlines()
+    time.sleep(2)
+    lines = [line.split() for line in lines]
+    cities = [[float(line[0]), float(line[1])] for line in lines]
+    points = []
+    for i, p in enumerate(cities):
+        points.append((p[0], p[1], i))
+    return points
 
+def gen_cities(n, max_xy, threshold=float("inf")):
     min_xy = max_xy / 200.0
     def coord():
         return min_xy + random.uniform(min_xy, max_xy)
-    return [(coord(), coord()) for i in range(n)]
-
-def gen_cities_annotated(n, max_xy):
-    cities = gen_cities(n,max_xy)
+    cities = [(coord(), coord()) for i in range(n)]
     points = []
     for i, p in enumerate(cities):
         points.append((p[0], p[1], i))
@@ -97,7 +102,8 @@ def exact_tsp(cities):
     return res_exact[1]
 
 def exact_trial(n):
-    cities = gen_cities_annotated(n,500)
+    #cities = gen_cities(n,500)
+    cities = read_cities()
 
     start_time = datetime.datetime.now()
     path = exact_tsp(cities)

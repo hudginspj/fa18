@@ -162,7 +162,8 @@ def mpi_tsp(cities):
     return res_rec[1]
 
 def mpi_trial(n):
-    cities = gen_cities_annotated(n,500)
+    #cities = gen_cities(n,500)
+    cities = read_cities()
 
     start_time = datetime.datetime.now()
     path = mpi_tsp(cities)

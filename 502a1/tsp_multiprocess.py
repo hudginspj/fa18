@@ -71,7 +71,8 @@ def threaded_tsp(cities):
     return res_rec[1]
 
 def threaded_trial(n):
-    cities = gen_cities_annotated(n,500)
+    #cities = gen_cities(n,500)
+    cities = read_cities()
 
     start_time = datetime.datetime.now()
     path = threaded_tsp(cities)
