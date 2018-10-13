@@ -3,7 +3,7 @@ import os
 import datetime
 import time
 from multiprocessing import Process, Pipe
-from exact1 import *
+from heldkarp import *
 from stitch import *
 
 def recursive_split_process(cities, depth, conn):

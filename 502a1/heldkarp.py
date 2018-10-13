@@ -78,7 +78,7 @@ def held_karp_start_endpoints(cities, start_point, endpoints):
                     if path_length < best_length:
                         best_length = path_length
                         best_path = best_paths[(s_minus_i,j)][1] + [i]
-                new_best_paths[s_minus_i] = (best_length, best_path)
+                new_best_paths[(S, i)] = (best_length, best_path)
         best_paths = new_best_paths
     
     res = []
