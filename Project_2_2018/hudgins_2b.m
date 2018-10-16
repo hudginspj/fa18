@@ -1,9 +1,14 @@
 close all
 format compact
 hold on
-rng(1, 'v4normal')
 
-load("P2_data.mat")
+%readtable("glass")
+
+%load("glass", 'ascii')
+
+[Y X]=libsvmread('glass');  
+X=full(X);
+
 
 
 plot(X(Y>0, 1), X(Y>0, 2), 'ro')
@@ -61,10 +66,7 @@ alpha = quadprog(H,p,A1,b1,Aeq,beq);
 support_vectors = find(alpha>0.01) %0.4362, 0.8538, 0.4177
 w2summation = alpha.*Y.*X;
 w = sum(w2summation)';
-%w2b = repmat(alpha.*Y,1,2).*X
-%w2 = sum(w2b, 1)
 
-%w = sum(repmat(alpha.*Y,1,2).*X,1)'
 
 Xw = X*w;
 b = mean(Y(support_vectors)-Xw(support_vectors));
@@ -73,12 +75,6 @@ w
 b
 margin = 1/norm(w)
 sv_alphas = alpha(support_vectors)
-test1 = w' * [3 4]' + b
-test2 = w' * [6 6]' + b
-
-%w1 x  + w2 y + b = 0
-
-
 
 xs = xlim;
 bound_ys = (-b - w(1)*xs)/w(2);
@@ -96,3 +92,9 @@ plot(Xsv(:,1),Xsv(:,2),'bo','markersize',10);
 
 
 
+
+
+function [x1, x2] = boundary(w)
+    x1 = -5:10;
+    x2 =  arrayfun(@(x) (-w(1)*x/w(2)) - w(3)/w(2),-5:10);
+end
