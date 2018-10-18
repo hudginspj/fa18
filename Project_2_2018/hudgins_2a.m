@@ -31,7 +31,8 @@ n = size(X,1);
 H = (Y*Y').*(X*X');
 H = H + eye(n)*1e-7
 p = repmat(-1,n,1);
-Aeq = Y';beq = 0;
+Aeq = Y';
+beq = 0;
 A1 = -1 * eye(n)
 b1 = repmat(0,n,1)
 % Following line runs the SVM
