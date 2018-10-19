@@ -47,52 +47,69 @@ lk_size = size(linkernel(X_tra, X, 1))
 %[C, param] = optimize(@grbf_fast, X, Y1, [1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1e-2 1e-1 1 1e1 1e2 1e3])
 
 
-[ws, bs] = build_classifiers(@linkernel, X, Y)
-%errors = final_evaluation(X, Y, ws, bs)
+[vs, bs, ps] = build_classifiers(1, X, Y);
+for i = 1:10
+    class = prediction(@linkernel, X(i,:), X, vs, bs, ps, unique(Y)')
+    Yi = Y(i)
+end
+% errors = final_evaluation(1, X, Y, ws, bs, ps)
 
 %G = grbf_fast(X, X, 1)
 
-function [ws, bs] = build_classifiers(kernel, X, Y)
-    if kernel @gbrf_fast
-        params = [1e-2 1e-1 1 1e1 1e2 1e3]
-    elseif kernel == @linkernel
-        params = [1]
+function [kernel, params] = kernelparams(kernelno)
+    if kernelno == 1
+        kernel = @linkernel;
+        params = [1];
+    elseif kernelno == 2
+        kernel = @grbf_fast;
+        params = [1e-2 1e-1 1 1e1 1e2 1e3];  
     end
-    C0 = [1e-2 1e-1 1 1e1 1e2 1e3 1e4]
+end
+
+
+function [ws, bs, ps] = build_classifiers(kernelno, X, Y)
+    [kernel, params] = kernelparams(kernelno);
+    C0 = [1];%[1e-2 1e-1 1 1e1 1e2 1e3 1e4];
     
-    bs = []
-    ws = []
-    yvals = unique(Y)'
+    bs = [];
+    ws = [];
+    ps = [];
+    yvals = unique(Y)';
     for i = yvals
-        Yi = transform_y(Y, y_val)
-        [C, param] = optimize(kernel, X, Yi,C0,params);
-        [ws(i,:), bs(i)] = train_soft(X, Y1, C);
+        Yi = transform_y(Y, i);
+        [C, param] = optimize(kernel, X, Yi,C0,params)
+        ps(i) = param;
+        [ws(i,:), bs(i)] = train_soft(kernel, X, Yi, C, param);
     end
 end
 
 
 
-function errors = final_evaluation(X, Y, ws, bs)
+function errors = final_evaluation(kernelno, X, Y, vs, bs, ps)
     errors = 0;
+    [kernel, params] = kernelparams(kernelno);
+    
     for i = 1:length(Y)
-        [class] = prediction(X(i,:), ws, bs, unique(Y)');
-        actual = Y(i);
+        [class] = prediction(kernel, X(i,:), X, vs, bs, ps, unique(Y)')
+        actual = Y(i)
         if class ~= actual
             errors = errors +1;
         end
     end
 end
 
-function [class] = prediction(x, ws, bs, yvals)
+function [class] = prediction(kernel, x, X, vs, bs, ps, yvals)
     d = [];
     
     for i = yvals
-        x;
-        w = ws(i,:);
+        v = vs(i,:);
         b = bs(i);
-        d(i) = decision(w', b, x);
+        param = ps(i);  %%%%%%%%% TODO merge this function with final_eval
+        k_test = kernel(x, X, ps(i));
+        d(i) = decision(v', b, k_test');
+        %d(i) = d;
     end
-    d;
+    d
     [val, class] = max(d);
 end
 
@@ -138,13 +155,7 @@ function [errors] = xval(kernel, X, Y, C, param)
     end
 end
 
-function [errors] = score(K_test, Y, v, b)
-    %K_test = kernel(X_test, X_train, param)
-    dim = size(K_test);
-    predictions = arrayfun(@(i) sign(decision(v, b, K_test(i,:)')), 1:dim(1));
-    error_arr = ((predictions'.*Y)-1)/-2;
-    errors = sum(error_arr);
-end
+
 
 function [v, b] = train_soft(kernel, X, Y, C, param)
 
@@ -193,6 +204,15 @@ end
 %     plot(Xsv(:,1),Xsv(:,2),'bo','markersize',10);
 % end
 
+
+
+function [errors] = score(K_test, Y, v, b)
+    %K_test = kernel(X_test, X_train, param)
+    dim = size(K_test);
+    predictions = arrayfun(@(i) sign(decision(v, b, K_test(i,:)')), 1:dim(1));
+    error_arr = ((predictions'.*Y)-1)/-2;
+    errors = sum(error_arr);
+end
 
 function [d] = decision(v, b, K_test)
     vs = size(v');

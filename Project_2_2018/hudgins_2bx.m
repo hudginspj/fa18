@@ -36,10 +36,14 @@ Y1 = (Y==1)*2 -1;
 %[C, param] = optimize(X, Y1, [1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1])
 
 %num_classes = length(unique(Y))
-%[ws, bs] = build_classifiers(X, Y)
-%errors = final_evaluation(X, Y, ws, bs)
 
-G = grbf_fast(X, X, 1)
+[ws, bs] = build_classifiers(X, Y)
+% for i = 1:10
+%     class = prediction(X(i,:), ws, bs, unique(Y)')
+%     Yi = Y(i)
+% end
+errors = final_evaluation(X, Y, ws, bs)
+
 
 function [ws, bs] = build_classifiers(X, Y)
     yvals = unique(Y)'
@@ -87,7 +91,7 @@ end
 
 function [w, b] = build_classifer(X, Y, y_val)
     Y1 = transform_y(Y, y_val)
-    [C, param] = optimize(X, Y1,[1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1]);
+    [C, param] = optimize(X, Y1,[1], [1]);%[1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1]);
     [w, b] = train_soft(X, Y1, C);
 end
 
