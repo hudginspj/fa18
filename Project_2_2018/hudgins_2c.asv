@@ -31,15 +31,15 @@ Y1 = (Y==1)*2 -1;
 X_tra = X(1:10,:);
 
 size(X_tra)
-gk_size = size(grbf_fast(X_tra, X, 1))
+size(grbf_fast(X_tra, X, 1))
 
-%pk_size = size(polykernel(X_tra, X, 2))
-lk_size = size(linkernel(X_tra, X, 1))
+%size(polykernel(X_tra, X, 2))
+size(linkernel(X_tra, X, 1))
 
-[v, b] = train_soft(@linkernel, X, Y1, 1, 1);
+[v, b] = train_soft(@linkernel, X, Y1, 1);
 
-%d = decision(v, b, linkernel(X, X(1,:), 1))
-K_test = linkernel(X(1:200, :), X, 1);
+d = decision(v, b, linkernel(X, X(1,:), 1))
+K_test = linkernel(X(1:200, :), X, 1)
 [errors] = score(K_test, Y1(1:200), v, b)
 
 %[errors] = xval(X, Y1, 1)
@@ -131,16 +131,16 @@ end
 
 function [errors] = score(K_test, Y, v, b)
     %K_test = kernel(X_test, X_train, param)
-    dim = size(K_test);
+    dim = size(K_test)
     predictions = arrayfun(@(i) sign(decision(v, b, K_test(:,i)')), 1:dim(2));
     error_arr = ((predictions'.*Y)-1)/-2;
     errors = sum(error_arr);
 end
 
-function [v, b] = train_soft(kernel, X, Y, C, param)
+function [v, b] = train_soft(kernel, X, Y, C)
 
     n = size(X,1);
-    G = kernel(X, X, param);
+    G = kernel(X, X);
     H = (Y*Y').*G;
     H = H + eye(n)*1e-7;
     p = repmat(-1,n,1);
