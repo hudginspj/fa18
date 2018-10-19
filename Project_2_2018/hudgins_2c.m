@@ -28,10 +28,20 @@ Y = Y(shuffle_idx);
 Y ;
 Y1 = (Y==1)*2 -1;
 
+X_tra = X(1:10,:);
 
-%[w, b] = train_soft(X, Y1, 1);
+size(X_tra)
+size(grbf_fast(X_tra, X, 1))
 
-%[errors] = score(X, Y1, w, b);
+%size(polykernel(X_tra, X, 2))
+size(linkernel(X_tra, X, 1))
+
+[v, b] = train_soft(X, Y1, 1);
+
+d = decision(v, b, linkernel(X, X(1,:), 1))
+K_test = linkernel(X(1:200, :), X, 1)
+[errors] = score(K_test, Y1(1:200), v, b)
+
 %[errors] = xval(X, Y1, 1)
 %[C, param] = optimize(X, Y1, [1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1])
 
@@ -39,7 +49,7 @@ Y1 = (Y==1)*2 -1;
 %[ws, bs] = build_classifiers(X, Y)
 %errors = final_evaluation(X, Y, ws, bs)
 
-G = grbf_fast(X, X, 1)
+%G = grbf_fast(X, X, 1)
 
 function [ws, bs] = build_classifiers(X, Y)
     yvals = unique(Y)'
@@ -75,11 +85,6 @@ function [class] = prediction(x, ws, bs, yvals)
     d;
     [val, class] = max(d);
 end
-% function [errors] = score(X, Y, w, b)
-%     predictions = arrayfun(@(i) sign(decision(w, b, X(i,:))), 1:length(X));
-%     error_arr = ((predictions'.*Y)-1)/-2;
-%     errors = sum(error_arr);
-% end
 
 function [Y1] = transform_y(Y, y_val)
     Y1 = (Y==y_val)*2 -1;
@@ -124,13 +129,15 @@ function [errors] = xval(X, Y, C)
     end
 end
 
-function [errors] = score(X, Y, w, b)
-    predictions = arrayfun(@(i) sign(decision(w, b, X(i,:))), 1:length(X));
+function [errors] = score(K_test, Y, v, b)
+    %K_test = kernel(X_test, X_train, param)
+    dim = size(K_test)
+    predictions = arrayfun(@(i) sign(decision(v, b, K_test(:,i)')), 1:dim(2));
     error_arr = ((predictions'.*Y)-1)/-2;
     errors = sum(error_arr);
 end
 
-function [w, b] = train_soft(X, Y, C)
+function [v, b] = train_soft(X, Y, C)
 
     n = size(X,1);
     H = (Y*Y').*(X*X');
@@ -148,8 +155,10 @@ function [w, b] = train_soft(X, Y, C)
 
 
     support_vectors = find(alpha>0.01);
-    w2summation = alpha.*Y.*X;
+    w2summation = (alpha.*Y).*X;
     w = sum(w2summation)';
+    
+    v = (alpha.*Y);
 
 
     Xw = X*w;
@@ -175,6 +184,28 @@ end
 % end
 
 
-function [d] = decision(w, b, x)
-    d = w' * x' + b;
+function [d] = decision(v, b, K_test)
+    vs = size(v');
+    ks = size(K_test);
+    d = v' * K_test' + b;
 end
+
+function [K] = polykernel(input, X_tra, param)
+     for i = 1:length(input)
+         size(input(i,:))
+         size(X_tra*input(i,:)')
+         
+         K(i,:) = (X_tra*input(i,:)' + 1)^param
+     end
+    
+end
+
+function [K] = linkernel(input, X_tra, param)
+    size(input);
+    size(X_tra);
+    
+    
+    K = X_tra * input';
+    
+end
+
