@@ -36,27 +36,39 @@ gk_size = size(grbf_fast(X_tra, X, 1))
 %pk_size = size(polykernel(X_tra, X, 2))
 lk_size = size(linkernel(X_tra, X, 1))
 
-[v, b] = train_soft(@linkernel, X, Y1, 1, 1);
+%[v, b] = train_soft(@grbf_fast, X, Y1, 1, 1);
 
 %d = decision(v, b, linkernel(X, X(1,:), 1))
-K_test = linkernel(X(1:200, :), X, 1);
-[errors] = score(K_test, Y1(1:200), v, b)
+%K_test = grbf_fast(X(1:200, :), X, 1);
+%kt_size = size(K_test)
+%[errors] = score(K_test, Y1(1:200), v, b)
 
-%[errors] = xval(X, Y1, 1)
-%[C, param] = optimize(X, Y1, [1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1])
+%[errors] = xval(@grbf_fast, X, Y1, 1, 1)
+%[C, param] = optimize(@grbf_fast, X, Y1, [1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1e-2 1e-1 1 1e1 1e2 1e3])
 
-%num_classes = length(unique(Y))
-%[ws, bs] = build_classifiers(X, Y)
-%errors = final_evaluation(X, Y, ws, bs)
+
+[ws, bs] = build_classifiers(1, X, Y)
+errors = final_evaluation(X, Y, ws, bs)
 
 %G = grbf_fast(X, X, 1)
 
-function [ws, bs] = build_classifiers(X, Y)
-    yvals = unique(Y)'
-    bs = []
-    ws = []
+function [ws, bs] = build_classifiers(kernelno, X, Y)
+    if kernelno == 1
+        kernel = @linkernel;
+        params = [1];
+    elseif kernelno == 2
+        kernel = @grbf_fast;
+        params = [1e-2 1e-1 1 1e1 1e2 1e3];  
+    end
+    C0 = [1e-2 1e-1 1 1e1 1e2 1e3 1e4];
+    
+    bs = [];
+    ws = [];
+    yvals = unique(Y)';
     for i = yvals
-        [ws(i,:), bs(i)] = build_classifer(X, Y, i);
+        Yi = transform_y(Y, i);
+        [C, param] = optimize(kernel, X, Yi,C0,params)
+        [ws(i,:), bs(i)] = train_soft(kernel, X, Yi, C, param);
     end
 end
 
@@ -90,13 +102,13 @@ function [Y1] = transform_y(Y, y_val)
     Y1 = (Y==y_val)*2 -1;
 end
 
-function [w, b] = build_classifer(X, Y, y_val)
-    Y1 = transform_y(Y, y_val)
-    [C, param] = optimize(X, Y1,[1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1]);
-    [w, b] = train_soft(X, Y1, C);
-end
+% function [w, b] = build_classifer(kernel, X, Y, y_val, C0, params)
+%     Y1 = transform_y(Y, y_val)
+%     [C, param] = optimize(X, Y1,C0,params);
+%     [w, b] = train_soft(X, Y1, C);
+% end
 
-function [best_C, best_param] = optimize(X, Y, C0, parameters)
+function [best_C, best_param] = optimize(kernel, X, Y, C0, parameters)
     best_C = 0;
     best_errors = inf;
     best_param = 0;
@@ -104,8 +116,7 @@ function [best_C, best_param] = optimize(X, Y, C0, parameters)
         C = C0(i);
         for j = 1:length(parameters)
             param = parameters(j);
-            [errors] = xval(X, Y, C); % ADD param
-            %errors = 21
+            [errors] = xval(kernel, X, Y, C, param);
             if errors < best_errors
                 best_errors = errors;
                 best_C = C;
@@ -115,24 +126,24 @@ function [best_C, best_param] = optimize(X, Y, C0, parameters)
     end
 end
 
-function [errors] = xval(X, Y, C)
+function [errors] = xval(kernel, X, Y, C, param)
     indices = crossvalind('Kfold',length(Y),5);
     errors = 0;
     for i = 1:10
        test = (indices == i);
        tra = ~test;
-       [w, b] = train_soft(X(tra,:), Y(tra), C);
-       %pred = arrayfun(@(x) sign(x), X(test,:) * w');
-       %y(test);
-       %dif = pred - y(test);
-       errors = errors + score(X(test,:), Y(test), w, b)
+       [v, b] = train_soft(kernel, X(tra,:), Y(tra), C, param);
+       
+       K_test = kernel(X(test,:), X(tra,:), param);
+       size(K_test);
+       errors = errors + score(K_test, Y(test), v, b);
     end
 end
 
 function [errors] = score(K_test, Y, v, b)
     %K_test = kernel(X_test, X_train, param)
     dim = size(K_test);
-    predictions = arrayfun(@(i) sign(decision(v, b, K_test(:,i)')), 1:dim(2));
+    predictions = arrayfun(@(i) sign(decision(v, b, K_test(i,:)')), 1:dim(1));
     error_arr = ((predictions'.*Y)-1)/-2;
     errors = sum(error_arr);
 end
@@ -141,7 +152,7 @@ function [v, b] = train_soft(kernel, X, Y, C, param)
 
     n = size(X,1);
     G = kernel(X, X, param);
-    H = (Y*Y').*G;
+    H = (Y*Y').*G';
     H = H + eye(n)*1e-7;
     p = repmat(-1,n,1);
     Aeq = Y';
@@ -188,7 +199,7 @@ end
 function [d] = decision(v, b, K_test)
     vs = size(v');
     ks = size(K_test);
-    d = v' * K_test' + b;
+    d = v' * K_test + b;
 end
 
 function [K] = polykernel(input, X_tra, param)
@@ -206,7 +217,7 @@ function [K] = linkernel(input, X_tra, param)
     size(X_tra);
     
     
-    K = X_tra * input';
+    K = input * X_tra';
     
 end
 
