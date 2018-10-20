@@ -3,11 +3,12 @@ format compact
 hold on
 rng(1, 'v4normal')
 
-load("P2_data.mat")
+load("P2_data.mat");
 
 
-plot(X(Y>0, 1), X(Y>0, 2), 'ro')
-plot(X(Y<0, 1), X(Y<0, 2), 'go')
+plot(X(Y>0, 1), X(Y>0, 2), 'ro');
+plot(X(Y<0, 1), X(Y<0, 2), 'go');
+ylen = length(Y)
 
 title('Training data and boundaries')
 xlabel('x1') 
@@ -29,12 +30,12 @@ ylabel('x2')
 
 n = size(X,1);
 H = (Y*Y').*(X*X');
-H = H + eye(n)*1e-7
+H = H + eye(n)*1e-7;
 p = repmat(-1,n,1);
 Aeq = Y';
 beq = 0;
-A1 = -1 * eye(n)
-b1 = repmat(0,n,1)
+A1 = -1 * eye(n);
+b1 = repmat(0,n,1);
 % Following line runs the SVM
 alpha = quadprog(H,p,A1,b1,Aeq,beq);
 %alpha = quadprog(H,-f,A,b,Aeq,beq,LB,UB);
@@ -76,8 +77,6 @@ margin = 1/norm(w)
 sv_alphas = alpha(support_vectors)
 test1 = w' * [3 4]' + b
 test2 = w' * [6 6]' + b
-
-%w1 x  + w2 y + b = 0
 
 
 

@@ -33,22 +33,24 @@ X_tra = X(1:10,:);
 size(X_tra)
 gk_size = size(grbf_fast(X_tra, X, 1))
 
-%pk_size = size(polykernel(X_tra, X, 2))
+pk_size = size(polykernel(X_tra, X, 2))
 lk_size = size(linkernel(X_tra, X, 1))
 
-[v, b] = train_soft(@grbf_fast, X, transform_y(Y, 1), 1, 1);
+%[v, b] = train_soft(@polykernel, X, transform_y(Y, 1), 1, 2);
 
 %d = decision(v, b, linkernel(X, X(1,:), 1))
-K_test = grbf_fast(X, X, 1);
-%kt_size = size(K_test)
-[errors, predictions] = score(K_test, transform_y(Y, 1), v, b)
+%K_test = polykernel(X, X, 2);
+%[errors] = score(K_test, transform_y(Y, 1), v, b)
 
 %[errors] = xval(@grbf_fast, X, transform_y(Y, 5), 1, 1)
 %[C, param] = optimize(@grbf_fast, X, Y1, [1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1e-2 1e-1 1 1e1 1e2 1e3])
+%[C, param] = optimize(@polykernel, X, Y1, [1], [1 2 3])
 
 
-%[vs, bs, ps] = build_classifiers(2, X, Y);
-%errors = final_evaluation(2, X, Y, vs, bs, ps)
+[vs, bs, ps, cs] = build_classifiers(3, X, Y);
+ps
+cs
+errors = final_evaluation(3, X, Y, vs, bs, ps)
 % for i = 1:10
 %     class = prediction(@linkernel, X(i,:), X, vs, bs, ps, unique(Y)')
 %     Yi = Y(i)
@@ -63,22 +65,27 @@ function [kernel, params] = kernelparams(kernelno)
         params = [1];
     elseif kernelno == 2
         kernel = @grbf_fast;
-        params = [1e-2 1e-1 1 1e1 1e2 1e3];  
+        params = [1];%[1e-2 1e-1 1 1e1 1e2 1e3];
+    elseif kernelno == 3
+        kernel = @polykernel;
+        params = [1 2 3 4 5]; 
     end
 end
 
 
-function [ws, bs, ps] = build_classifiers(kernelno, X, Y)
+function [ws, bs, ps, cs] = build_classifiers(kernelno, X, Y)
     [kernel, params] = kernelparams(kernelno);
-    C0 = [1];%[1e-2 1e-1 1 1e1 1e2 1e3 1e4];
+    C0 = [1e-2 1e-1 1 1e1 1e2 1e3 1e4];
     
     bs = [];
     ws = [];
     ps = [];
+    cs = []
     yvals = unique(Y)';
     for i = yvals
         Yi = transform_y(Y, i);
         [C, param] = optimize(kernel, X, Yi,C0,params)
+        cs(i) = C;
         ps(i) = param;
         [ws(i,:), bs(i)] = train_soft(kernel, X, Yi, C, param);
     end
@@ -91,8 +98,8 @@ function errors = final_evaluation(kernelno, X, Y, vs, bs, ps)
     [kernel, params] = kernelparams(kernelno);
     
     for i = 1:length(Y)
-        [class] = prediction(kernel, X(i,:), X, vs, bs, ps, unique(Y)')
-        actual = Y(i)
+        [class] = prediction(kernel, X(i,:), X, vs, bs, ps, unique(Y)');
+        actual = Y(i);
         if class ~= actual
             errors = errors +1;
         end
@@ -105,12 +112,12 @@ function [class] = prediction(kernel, x, X, vs, bs, ps, yvals)
     for i = yvals
         v = vs(i,:);
         b = bs(i);
-        param = ps(i);  %%%%%%%%% TODO merge this function with final_eval
+        param = ps(i);  
         k_test = kernel(x, X, ps(i));
         d(i) = decision(v', b, k_test');
         %d(i) = d;
     end
-    d
+    d;
     [val, class] = max(d);
 end
 
@@ -125,9 +132,9 @@ end
 % end
 
 function [best_C, best_param] = optimize(kernel, X, Y, C0, parameters)
-    best_C = 0;
+    best_C = -1;
     best_errors = inf;
-    best_param = 0;
+    best_param = -1;
     for i = 1:length(C0)
         C = C0(i);
         for j = 1:length(parameters)
@@ -175,25 +182,25 @@ function [v, b] = train_soft(kernel, X, Y, C, param)
     
     alpha = quadprog(H,p,A,b,Aeq,beq,LB, UB);
 
-    fout = sum(repmat(alpha.*Y,1,n).*K,1)';
-    support_vectors = find(alpha>1e-6);
-    bias = mean(Y(support_vectors)-fout(pos));
-    
-    
-    support_vectors = find(alpha>0.01);
-    w2summation = (alpha.*Y).*X;
-    w = sum(w2summation)';
-    
     v = (alpha.*Y);
-
-
-    Xw = X*w;
-    b = mean(Y(support_vectors)-Xw(support_vectors));
     
-    w;
-    b;
-    margin = 1/norm(w);
-    sv_alphas = alpha(support_vectors);
+    support_vectors = find(alpha>1e-5);
+    pred = (v' * G')';
+    b = mean(Y(support_vectors)-pred(support_vectors));
+%     support_vectors = find(alpha>0.01);
+%     w2summation = (alpha.*Y).*X;
+%     w = sum(w2summation)';
+%     
+
+% 
+% 
+%     Xw = X*w;
+%     b = mean(Y(support_vectors)-Xw(support_vectors));
+%     
+%     w;
+%     b;
+%     margin = 1/norm(w);
+%     sv_alphas = alpha(support_vectors);
 end
 
 % function [Xsv] = plot_bound(w, b)
@@ -226,12 +233,16 @@ function [d] = decision(v, b, K_test)
 end
 
 function [K] = polykernel(input, X_tra, param)
-     for i = 1:length(input)
-         size(input(i,:))
-         size(X_tra*input(i,:)')
-         
-         K(i,:) = (X_tra*input(i,:)' + 1)^param
-     end
+    K=[];
+    for i = 1:size(input, 1)
+        xi = input(i,:);
+        for j = 1:size(X_tra,1)
+             xj = X_tra(j,:);
+             xsize = size(xj);
+             k = (xi*xj' + 1)^param;
+             K(i,j) = k;
+        end
+    end
     
 end
 
