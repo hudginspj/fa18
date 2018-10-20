@@ -34,21 +34,20 @@ size(X_tra)
 gk_size = size(grbf_fast(X_tra, X, 1))
 
 %pk_size = size(polykernel(X_tra, X, 2))
-lk_size = size(linkernel(X_tra, X, 1))
+%lk_size = size(linkernel(X_tra, X, 1))
 
-%[v, b] = train_soft(@grbf_fast, X, Y1, 1, 1);
+%[v, b] = train_soft(@grbf_fast, X, transform_y(Y, 1), 1, 1);
 
 %d = decision(v, b, linkernel(X, X(1,:), 1))
-%K_test = grbf_fast(X(1:200, :), X, 1);
-%kt_size = size(K_test)
-%[errors] = score(K_test, Y1(1:200), v, b)
+%K_test = grbf_fast(X, X, 1);
+%[errors] = score(K_test, transform_y(Y, 1), v, b)
 
-%[errors] = xval(@grbf_fast, X, Y1, 1, 1)
+%[errors] = xval(@grbf_fast, X, transform_y(Y, 5), 1, 1)
 %[C, param] = optimize(@grbf_fast, X, Y1, [1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1e-2 1e-1 1 1e1 1e2 1e3])
 
 
-[vs, bs, ps] = build_classifiers(1, X, Y);
-errors = final_evaluation(1, X, Y, vs, bs, ps)
+[vs, bs, ps] = build_classifiers(2, X, Y);
+errors = final_evaluation(2, X, Y, vs, bs, ps)
 % for i = 1:10
 %     class = prediction(@linkernel, X(i,:), X, vs, bs, ps, unique(Y)')
 %     Yi = Y(i)
@@ -70,7 +69,7 @@ end
 
 function [ws, bs, ps] = build_classifiers(kernelno, X, Y)
     [kernel, params] = kernelparams(kernelno);
-    C0 = [1];%[1e-2 1e-1 1 1e1 1e2 1e3 1e4];
+    C0 = [1e-2 1e-1 1 1e1 1e2 1e3 1e4];
     
     bs = [];
     ws = [];
@@ -175,21 +174,25 @@ function [v, b] = train_soft(kernel, X, Y, C, param)
     
     alpha = quadprog(H,p,A,b,Aeq,beq,LB, UB);
 
-
-    support_vectors = find(alpha>0.01);
-    w2summation = (alpha.*Y).*X;
-    w = sum(w2summation)';
-    
     v = (alpha.*Y);
-
-
-    Xw = X*w;
-    b = mean(Y(support_vectors)-Xw(support_vectors));
     
-    w;
-    b;
-    margin = 1/norm(w);
-    sv_alphas = alpha(support_vectors);
+    support_vectors = find(alpha>1e-5);
+    pred = (v' * G')';
+    b = mean(Y(support_vectors)-pred(support_vectors))
+%     support_vectors = find(alpha>0.01);
+%     w2summation = (alpha.*Y).*X;
+%     w = sum(w2summation)';
+%     
+
+% 
+% 
+%     Xw = X*w;
+%     b = mean(Y(support_vectors)-Xw(support_vectors));
+%     
+%     w;
+%     b;
+%     margin = 1/norm(w);
+%     sv_alphas = alpha(support_vectors);
 end
 
 % function [Xsv] = plot_bound(w, b)
@@ -207,7 +210,7 @@ end
 
 
 
-function [errors] = score(K_test, Y, v, b)
+function [errors, predictions] = score(K_test, Y, v, b)
     %K_test = kernel(X_test, X_train, param)
     dim = size(K_test);
     predictions = arrayfun(@(i) sign(decision(v, b, K_test(i,:)')), 1:dim(1));
