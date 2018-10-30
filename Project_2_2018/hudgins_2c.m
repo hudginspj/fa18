@@ -46,12 +46,17 @@ lk_size = size(linkernel(X_tra, X, 1))
 %[C, param] = optimize(@grbf_fast, X, Y1, [1e-2 1e-1 1 1e1 1e2 1e3 1e4], [1e-2 1e-1 1 1e1 1e2 1e3])
 %[C, param] = optimize(@polykernel, X, Y1, [1], [1 2 3])
 
-
-[vs, bs, ps, cs] = build_classifiers(3, X, Y);
-ps
-cs
+KERNELNO = 3
+[vs, bs, ps, cs] = build_classifiers(KERNELNO, X, Y);
 cs(1)
-errors = final_evaluation(3, X, Y, vs, bs, ps)
+cs(2)
+cs(3)
+cs(5)
+cs(6)
+cs(7)
+cs
+ps
+errors = final_evaluation(KERNELNO, X, Y, vs, bs, ps)
 % for i = 1:10
 %     class = prediction(@linkernel, X(i,:), X, vs, bs, ps, unique(Y)')
 %     Yi = Y(i)
