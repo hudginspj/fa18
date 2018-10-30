@@ -28,7 +28,7 @@ size(X)
 % N0 = [5 10 15 25 50 75 100] or, whatever you prefer
 % I0 = [100 250 500 1000] or if 1000 is not enough go for more
 N0 = 50;
-I0 = 100; %11;
+I0 = 500; %11;
 % 
 %A = arrayfun(@(x) mean(x.f1),S)
 f = @tanh;
@@ -59,7 +59,7 @@ for num_n = N0
                     return
                 end
                 e = d-o;
-                sq_E = sq_E + e^2;
+                E = E + e^2;
                 %del_ok = e*(1-o^2)
                 del_ok = e;%(1-o^2)
                 dW = eta*del_ok.*y';
@@ -91,32 +91,16 @@ for num_n = N0
 % 	    	
 % 	    	update OL and HL weights
             end
-            sq_E
+            E
         end
         %W is trained
-        errors = 0;
         for j = ntrain+1:length(X)
-            x = X(j,:);
-            d = Y(j);
-            u = V*x';
-            y = arrayfun(f,u);
-            W;
-            o = W*y;
-            if o > 1.5
-                predicted_class = 2;
-            else
-                predicted_class = 1;
-            end
-            if predicted_class ~= d
-                errors = errors + 1;
-                predicted_class;
-                d;
-            end
-            
-        end
-        errors
-        accuracy = 1 - (errors/ntest)
-                
+                x = X(j,:);
+                d = Y(j);
+                u = V*x';
+                y = arrayfun(f,u);
+                W;
+                o = W*y;
         
     end
 %     Training is over
@@ -135,6 +119,6 @@ end
 % 
 % 
 
-% function [class] = predict(W, V, x)
-%     
-% end
+function [class] = predict(W, V, x)
+    
+end
