@@ -25,17 +25,20 @@ size(X)
 % create train and test set
 % find numb of train data and call in ntrain, same for ntest
 % 
-% N0 = [5 10 15 25 50 75 100] or, whatever you prefer
-% I0 = [100 250 500 1000] or if 1000 is not enough go for more
-N0 = 50;
-I0 = 100; %11;
+%N0 = [5 10 15 25 50 75 100]% or, whatever you prefer
+N0 = [5 10 15 25]
+%N0 = 25;
+%I0 = [100 250 500 1000]% or if 1000 is not enough go for more
+I0 = [10 20 50 100]
+%I0 = 100; %11;
 % 
 %A = arrayfun(@(x) mean(x.f1),S)
 f = @tanh;
 df = @(x) 1 - f(x)^2;
 eta = 0.01;
-
-for num_n = N0
+E = []
+for ni = 1:length(N0)
+    num_n = N0(ni)
 % 		define random initial HL weighs V, and random OL weights W
     V = rand(num_n,nfeatures);
     vsize = size(V)
@@ -43,7 +46,8 @@ for num_n = N0
 
 %     for i = 1:length(I0) % i is an index of an epoch or a sweep through all data
 %         epochs = I0(i)
-    for epochs = I0
+    for ei = 1:length(I0)
+        epochs = I0(ei)
         epochs %#ok<*NOPRT>
         for epoch = 1:epochs
             epoch
@@ -116,6 +120,7 @@ for num_n = N0
         end
         errors
         accuracy = 1 - (errors/ntest)
+        E(ni,ei) = accuracy
                 
         
     end
@@ -124,6 +129,8 @@ for num_n = N0
 %     give them, find outputs see errors and save in error matrix E
 %     E(n,i) = 
 end
+E
+mesh(N0, I0, E)
 % 
 % find best numb of neurons and best numb of iterations.
 % plotting etc
