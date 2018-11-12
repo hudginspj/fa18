@@ -6,7 +6,7 @@ load("cancer.mat")
 size(X)
 size(Y)
 unique(Y)
-
+return
 
 
 % plot data inputs
