@@ -58,7 +58,7 @@ def swap(path0, path1, all_cities):
     def index_length(i, j):
         return length(all_cities[i], all_cities[j])
     def swap_cost():
-        return index_length(l0, r0) + index_length(l1, r1) #- index_length(l0, l1) - index_length(r0, r1)
+        return index_length(l0, r0) + index_length(l1, r1) - index_length(l0, l1) - index_length(r0, r1)
     best_swap_cost = float("inf")
     best_swap = (None, None, None, None)
     
@@ -66,7 +66,7 @@ def swap(path0, path1, all_cities):
         i1 = (i0+1)%len(path0)
         l0 = path0[i0]
         l1 = path0[i1]
-        for j0 in range(len(path0)):
+        for j0 in range(len(path1)):
             j1 = (j0+1)%len(path1)
             r0 = path1[j0]
             r1 = path1[j1]
@@ -92,38 +92,47 @@ def swap(path0, path1, all_cities):
     (i0, i1, j0, j1) = best_swap
     
     
-
-    path = path0[:i0+1]
-    if j0 > j1:
+    if i1 == 0:
+        path = path0[1:i0+1]
+    else:
+        path = path0[:i0+1]
+    
+    # if j0 == 0 and j1 == 1:
+    #     path += path1[0]
+    #     path += reversed(path1[1:])
+    if j0 == 0 and j1 == 6:
+        path += path1
+    elif j0 == 6 and j1 == 0:
+        path += reversed(path1)    
+    elif j0 > j1:
         path += path1[j0:]
         path += path1[:j1+1]
     else:
         path += list(reversed(path1[:j0+1]))
         path += list(reversed(path1[j1:]))
-    
-    path += path0[i1:]
-    print(best_swap)
-    print(path)
-    plot_path(path0, all_cities, 'g')
-    plot_path(path1, all_cities, 'b')
-    swap_points = (path0[i0], path0[i1], path1[j0], path1[j1])
-    plot_path(swap_points, all_cities, 'ro')
-    plot_path(path, all_cities, 'r:')
+
+    if i1 == 0:
+        path.append(path0[0])
+    else:
+        path += path0[i1:]
+    # print(best_swap)
+    # print(path)
+    # plot_path(path0, all_cities, 'g')
+    # plot_path(path1, all_cities, 'b')
+    # swap_points = (path0[i0], path0[i1], path1[j0], path1[j1])
+    # plot_path(swap_points, all_cities, 'ro')
+    # plot_path(path, all_cities, 'r:')
     return path
     
-        
-
-
 
 def one_swap(cities, all_cities):
     part0, part1 = x_partition(cities)
     path0 = exact_tsp(part0)
     path1 = exact_tsp(part1)
-    print(path0)
-    print(path1)
+    # print(path0)
+    # print(path1)
     path = swap(path0, path1, all_cities)
     return path
-
 
 
 def swap_test(n):
@@ -155,18 +164,14 @@ def plot_path(path, all_cities, color, swap_points=None):
     x = [all_cities[i][0] for i in path]
     y = [all_cities[i][1] for i in path]
     plt.plot(x, y, color)
-    # if swap_points:
-    #     x = [all_cities[i][0] for i in swap_points]
-    #     y = [all_cities[i][1] for i in swap_points]
-    #     plt.plot(x,y, 'ro')
-    # plt.grid(True)
+    plt.grid(True)
     #plt.show()
    
 
 
 if __name__ == "__main__":
     ratios = []
-    for i in range(10):
+    for i in range(100):
         ratios.append(swap_test(14))
     print(ratios)
     print(np.mean(ratios))
