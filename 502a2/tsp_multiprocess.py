@@ -6,6 +6,8 @@ import time
 from multiprocessing import Process, Pipe
 from heldkarp import *
 from stitch import *
+import matplotlib.pyplot as plt
+import numpy as np
 
 def recursive_split_process(cities, depth, conn):
     #print("Starting ", os.getpid())
@@ -26,7 +28,7 @@ def recursive_split(cities, depth=0):
     else:
         part0, part1 = y_partition(cities)
 
-    if depth <= 5:
+    if depth <= 2:
         # parent_conn_0, child_conn_0 = Pipe()
         # p0 = Process(target=recursive_split_process, args=(part0, depth+1, child_conn_0))
         # parent_conn_1, child_conn_1 = Pipe()
@@ -59,9 +61,9 @@ def recursive_split(cities, depth=0):
 
     top_endpoints = get_endpoints(endpoints0+endpoints1, math.sqrt(len(cities)))
 
-    if depth < 5:
+    if depth < 4:
         pass
-        #print("  " * depth, len(cities), len(subsol0), len(subsol1), len(top_endpoints))
+        print("  " * depth, len(cities), len(subsol0), len(subsol1), len(top_endpoints))
 
     return stitch(subsol0, subsol1, endpoints0, endpoints1, top_endpoints)
 
@@ -79,11 +81,18 @@ def threaded_trial(n):
     runtime = (datetime.datetime.now() - start_time).total_seconds()
     
     distance = total_distance(cities, path)
+    plot_path(path, cities, 'b')
     return n, runtime, distance
 
-
+def plot_path(path, all_cities, color, swap_points=None):
+    x = [all_cities[i][0] for i in path]
+    y = [all_cities[i][1] for i in path]
+    plt.plot(x, y, color)
+    plt.grid(True)
+    plt.savefig("old_mp.png")
+    plt.show()
 
 if __name__ == "__main__":
-    print(threaded_trial(1000))
+    print(threaded_trial(100000))
     
 

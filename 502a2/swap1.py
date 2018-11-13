@@ -115,7 +115,7 @@ def swap(path0, path1, all_cities):
         path.append(path0[0])
     else:
         path += path0[i1:]
-    print(best_swap)
+    #print(best_swap)
     # print(path)
     # plot_path(path0, all_cities, 'g')
     # plot_path(path1, all_cities, 'b')

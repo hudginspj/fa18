@@ -46,7 +46,7 @@ def recursive_split(cities, all_cities, depth=0):
     path1 = recursive_split(part1, all_cities, depth+1)
 
 
-    if depth < 5:
+    if depth < 4:
         pass
         print("  " * depth, len(cities), len(part0), len(path0), len(part1), len(path1))
     path = swap(path0, path1, all_cities)
@@ -62,6 +62,9 @@ def threaded_trial(n):
 
     start_time = datetime.datetime.now()
     path = threaded_tsp(cities)
+    plot_path(path, cities, "b")
+    plt.savefig("new_mp.png")
+    plt.show()
     runtime = (datetime.datetime.now() - start_time).total_seconds()
     
     distance = total_distance(cities, path)
@@ -70,6 +73,6 @@ def threaded_trial(n):
 
 
 if __name__ == "__main__":
-    print(threaded_trial(200))
+    print(threaded_trial(4000))
     
 
