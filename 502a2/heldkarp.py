@@ -107,6 +107,7 @@ def exact_trial(n):
 
     start_time = datetime.datetime.now()
     path = exact_tsp(cities)
+    print(path)
     runtime = (datetime.datetime.now() - start_time).total_seconds()
     
     distance = total_distance(cities, path)
