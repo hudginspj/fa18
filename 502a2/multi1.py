@@ -48,7 +48,7 @@ def recursive_split(cities, all_cities, depth=0):
 
     if depth < 5:
         pass
-        print("  " * depth, len(cities), len(path0), len(path1))
+        print("  " * depth, len(cities), len(part0), len(path0), len(part1), len(path1))
     path = swap(path0, path1, all_cities)
 
     return path

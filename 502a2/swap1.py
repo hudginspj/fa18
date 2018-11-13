@@ -100,9 +100,9 @@ def swap(path0, path1, all_cities):
     # if j0 == 0 and j1 == 1:
     #     path += path1[0]
     #     path += reversed(path1[1:])
-    if j0 == 0 and j1 == 6:
+    if j0 == 0 and j1 > 1:
         path += path1
-    elif j0 == 6 and j1 == 0:
+    elif j0 > 1 and j1 == 0:
         path += reversed(path1)    
     elif j0 > j1:
         path += path1[j0:]
@@ -115,13 +115,16 @@ def swap(path0, path1, all_cities):
         path.append(path0[0])
     else:
         path += path0[i1:]
-    # print(best_swap)
+    print(best_swap)
     # print(path)
     # plot_path(path0, all_cities, 'g')
     # plot_path(path1, all_cities, 'b')
     # swap_points = (path0[i0], path0[i1], path1[j0], path1[j1])
     # plot_path(swap_points, all_cities, 'ro')
     # plot_path(path, all_cities, 'r:')
+    if len(path) != len(path0) + len(path1):
+        print("err", len(path), len(path0), len(path1))
+        raise Exception("....")
     return path
     
 
