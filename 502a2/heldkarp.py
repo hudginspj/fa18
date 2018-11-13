@@ -88,6 +88,7 @@ def best_closed_sol(sols):
 
 def total_distance(cities, path):
     if len(path) != len(cities):
+        print("path/cities", len(path), len(cities))
         raise Exception("not a complete path")
     dist = length(cities[path[0]], cities[path[-1]])
     for i in range(len(cities)-1):

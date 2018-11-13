@@ -128,6 +128,7 @@ def one_swap(cities, all_cities):
 
 def swap_test(n):
     cities = gen_cities(n,500)
+    print("len cities", len(cities))
     #cities = read_cities()
 
     start_time = datetime.datetime.now()
@@ -139,14 +140,15 @@ def swap_test(n):
 
     #plot_path(path, cities)
 
-    path = exact_tsp(cities)
-    distance = total_distance(cities, path)
-    print(distance)
+    path_opt = exact_tsp(cities)
+    distance_opt = total_distance(cities, path_opt)
+    print(distance_opt)
 
     #plot_path(path, cities)
 
 
     #return len(cities), runtime, distance
+    return distance/distance_opt
 
 
 def plot_path(path, all_cities, color, swap_points=None):
@@ -163,6 +165,10 @@ def plot_path(path, all_cities, color, swap_points=None):
 
 
 if __name__ == "__main__":
-    swap_test(14)
+    ratios = []
+    for i in range(10):
+        ratios.append(swap_test(14))
+    print(ratios)
+    print(np.mean(ratios))
     plt.show()
     
