@@ -31,5 +31,19 @@ inversions:  0
 distance 31910.805698623684
 runtime 117.188859
 
+---5000/100
+distance 34410.33059230972
+runtime 82.446675
+inversions:  209  -100
+inversions:  8    -50
+inversions:  1    -100
+distance 32659.522071944873
+runtime 84.406831
+inversions:  97
+inversions:  3
+inversions:  0
+distance 31792.178021605454
+runtime 108.305577
+
 
 

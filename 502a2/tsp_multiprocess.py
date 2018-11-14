@@ -93,6 +93,6 @@ def plot_path(path, all_cities, color, swap_points=None):
     plt.show()
 
 if __name__ == "__main__":
-    print(threaded_trial(100000))
+    print(threaded_trial(5000))
     
 

@@ -51,13 +51,11 @@ def recursive_split(cities, all_cities, depth=0):
     return path
 
 def mpi_tsp(cities):
-    rec_sols, endpoints = recursive_split(cities)
-    res_rec = best_closed_sol(rec_sols)
-    return res_rec[1]
+    path = recursive_split(cities, cities, depth=0)
+    return path
 
 def mpi_trial(n):
-    #cities = gen_cities(n,500)
-    cities = read_cities()
+    cities = gen_cities(n,500)
 
     start_time = datetime.datetime.now()
     path = mpi_tsp(cities)
@@ -71,7 +69,7 @@ SPLIT_DEPTH = 4
 if rank != 0:
     recursive_split_MPI()
 else:
-    n, runtime, distance = mpi_trial(100000)
+    n, runtime, distance = mpi_trial(1000)
     print((SPLIT_DEPTH, n, runtime, distance))
     
 

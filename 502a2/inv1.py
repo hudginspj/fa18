@@ -5,7 +5,7 @@ import datetime
 import time
 from heldkarp import *
 from swap1 import *
-from multi1 import *
+
 
 
 def ccw(a,b,c):
@@ -46,40 +46,7 @@ def fix_inv(path, all_cities, limit=10):
     return path, count
 
 
-def inv_test3():
-    cities = gen_cities(5000,500)
 
-    start_time = datetime.datetime.now()
-    path = threaded_tsp(cities)
-    plot_path(path, cities, "r:")
-    #plt.savefig("new_mp.png")
-    distance = total_distance(cities, path)
-    print("distance", distance)
-    print("runtime", (datetime.datetime.now() - start_time).total_seconds())
-
-    # path, inversions = fix_inv(path, cities, 1000)
-    # path, inversions = fix_inv(path, cities, 20)
-    # path, inversions = fix_inv(path, cities, 20)
-    path, inversions = fix_inv(path, cities, 100)
-    path, inversions = fix_inv(path, cities, 50)
-    path, inversions = fix_inv(path, cities, 100)
-    
-    distance = total_distance(cities, path)
-    print("distance", distance)
-    print("runtime", (datetime.datetime.now() - start_time).total_seconds())
-    plot_path(path, cities, "g:")
-
-    path, inversions = fix_inv(path, cities, 5000)
-    path, inversions = fix_inv(path, cities, 500)
-    path, inversions = fix_inv(path, cities, 50)
-    distance = total_distance(cities, path)
-    print("distance", distance)
-    print("runtime", (datetime.datetime.now() - start_time).total_seconds())
-    plot_path(path, cities, "b")
-
-    
-
-    plt.show()
     
     
 
