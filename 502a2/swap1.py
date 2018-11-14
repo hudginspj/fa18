@@ -4,8 +4,8 @@ import datetime
 import time
 from multiprocessing import Process, Pipe
 from heldkarp import *
-import matplotlib.pyplot as plt
-import numpy as np
+#import matplotlib.pyplot as plt
+#import numpy as np
 
 def get_endpoints(points, n):
     #n = int(math.sqrt(len(points))) // 4
