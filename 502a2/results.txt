@@ -45,5 +45,16 @@ inversions:  0
 distance 31792.178021605454
 runtime 108.305577
 
-
-
+---5000/100 for limited swap
+distance 35626.17621555763
+runtime 17.604031
+inversions:  231
+inversions:  18
+inversions:  16
+distance 33721.76914149019
+runtime 19.561589
+inversions:  112
+inversions:  17
+inversions:  0
+distance 32647.27030220823
+runtime 43.173762

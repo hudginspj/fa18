@@ -16,12 +16,8 @@ def recursive_split_process(cities, depth, conn):
     conn.close()
 
 def recursive_split(cities, all_cities, depth=0):
-    
     if len(cities) < 11:
         path = exact_tsp(cities)
-        # endpoints = get_endpoints(cities, math.sqrt(len(cities)))
-        # sol = best_between_endpoints_annotated(cities, endpoints) # Held-karp
-        # return sol, endpoints
         return path
 
     if depth % 2 == 0:
@@ -29,23 +25,8 @@ def recursive_split(cities, all_cities, depth=0):
     else:
         part0, part1 = y_partition(cities)
 
-    # if depth <= 5:
-        
-
-    #     parent_conn_0, child_conn_0 = Pipe()
-    #     p0 = Process(target=recursive_split_process, args=(part0, depth+1, child_conn_0))
-
-    #     p0.start()
-
-    #     subsol1, endpoints1 = recursive_split(part1, depth+1)
-
-    #     subsol0, endpoints0 = parent_conn_0.recv()
-    #     p0.join()
-        
-    # else:
     path0 = recursive_split(part0, all_cities, depth+1)
     path1 = recursive_split(part1, all_cities, depth+1)
-
 
     if depth < 4:
         pass
@@ -59,7 +40,6 @@ def threaded_tsp(cities):
 
 def threaded_trial(n):
     cities = gen_cities(n,500)
-    #cities = read_cities()
 
     start_time = datetime.datetime.now()
     path = threaded_tsp(cities)
@@ -83,9 +63,6 @@ def inv_test3():
     print("distance", distance)
     print("runtime", (datetime.datetime.now() - start_time).total_seconds())
 
-    # path, inversions = fix_inv(path, cities, 1000)
-    # path, inversions = fix_inv(path, cities, 20)
-    # path, inversions = fix_inv(path, cities, 20)
     path, inversions = fix_inv(path, cities, 100)
     path, inversions = fix_inv(path, cities, 50)
     path, inversions = fix_inv(path, cities, 100)
@@ -106,10 +83,30 @@ def inv_test3():
     plt.show()
 
 
+def inv_test4():
+    cities = gen_cities(5000,500)
+
+    start_time = datetime.datetime.now()
+    path = threaded_tsp(cities)
+    plot_path(path, cities, "r:")
+    #plt.savefig("new_mp.png")
+    distance = total_distance(cities, path)
+    print("distance", distance)
+    print("runtime", (datetime.datetime.now() - start_time).total_seconds())
+
+    path, inversions = fix_inv(path, cities, 200)
+    path, inversions = fix_inv(path, cities, 50)
+    
+    distance = total_distance(cities, path)
+    print("distance", distance)
+    print("runtime", (datetime.datetime.now() - start_time).total_seconds())
+    plot_path(path, cities, "b")
+
+    plt.show()
 
 
 if __name__ == "__main__":
-    #print(threaded_trial(4000))
+    #print(threaded_trial(5000))
     inv_test3()
     
 

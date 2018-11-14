@@ -4,8 +4,8 @@ import datetime
 import time
 from multiprocessing import Process, Pipe
 from heldkarp import *
-#import matplotlib.pyplot as plt
-#import numpy as np
+import matplotlib.pyplot as plt
+import numpy as np
 
 def get_endpoints(points, n):
     #n = int(math.sqrt(len(points))) // 4
@@ -52,9 +52,7 @@ def y_partition(cities):
 comps = []
 non_comps = []
 
-
-
-def swap(path0, path1, all_cities):
+def swap_all(path0, path1, all_cities):
     def index_length(i, j):
         return length(all_cities[i], all_cities[j])
     def swap_cost():
@@ -115,13 +113,91 @@ def swap(path0, path1, all_cities):
         path.append(path0[0])
     else:
         path += path0[i1:]
-    #print(best_swap)
-    # print(path)
-    # plot_path(path0, all_cities, 'g')
-    # plot_path(path1, all_cities, 'b')
-    # swap_points = (path0[i0], path0[i1], path1[j0], path1[j1])
-    # plot_path(swap_points, all_cities, 'ro')
-    # plot_path(path, all_cities, 'r:')
+    if len(path) != len(path0) + len(path1):
+        print("err", len(path), len(path0), len(path1))
+        raise Exception("....")
+    return path
+
+def near_path_indexies(path0, path1, all_cities):
+    n_ideal = 200
+    n = max(len(path0), len(path1))
+    if n < n_ideal:
+        return range(len(path0)), range(len(path1))
+    xs0 = [all_cities[i][0] for i in path0]
+    min_x0 , max_x0 = min(xs0), max(xs0)
+    ys0 = [all_cities[i][1] for i in path0]
+    min_y0 , max_y0 = min(ys0), max(ys0)
+    xs1 = [all_cities[i][0] for i in path1]
+    min_x1 , max_x1 = min(xs1), max(xs1)
+    ys1 = [all_cities[i][1] for i in path1]
+    min_y1 , max_y1 = min(ys1), max(ys1)
+    # print(min_x0 , max_x0, min_x1 , max_x1)
+    # print(min_y0 , max_y0, min_y1 , max_y1)
+
+    if max_x0 < min_x1:
+        cutoff0 = max_x0 - ((n_ideal/n) * (max_x0-min_x0))
+        cutoff1 = min_x1 + ((n_ideal/n) * (max_x1-min_x1))
+        path0_indexes = [i for i in range(len(path0)) if all_cities[path0[i]][0] > cutoff0]
+        path1_indexes = [i for i in range(len(path1)) if all_cities[path1[i]][0] < cutoff1]
+        return path0_indexes, path1_indexes
+    elif max_y0 < min_y1:
+        cutoff0 = max_y0 - ((n_ideal/n) * (max_y0-min_y0))
+        cutoff1 = min_y1 + ((n_ideal/n) * (max_y1-min_y1))
+        path0_indexes = [i for i in range(len(path0)) if all_cities[path0[i]][1] > cutoff0]
+        path1_indexes = [i for i in range(len(path1)) if all_cities[path1[i]][1] < cutoff1]
+        return path0_indexes, path1_indexes
+    else:
+        raise Exception("Couldn't guess partition")
+
+
+
+def swap(path0, path1, all_cities):
+    def index_length(i, j):
+        return length(all_cities[i], all_cities[j])
+    def swap_cost():
+        return index_length(l0, r0) + index_length(l1, r1) - index_length(l0, l1) - index_length(r0, r1)
+    best_swap_cost = float("inf")
+    best_swap = (None, None, None, None)
+    
+    path0_indexes, path1_indexes = near_path_indexies(path0, path1, all_cities)
+
+    for i0 in path0_indexes:   #TODO handle last i
+        i1 = (i0+1)%len(path0)
+        l0 = path0[i0]
+        l1 = path0[i1]
+        for j0 in path1_indexes:
+            j1 = (j0+1)%len(path1)
+            r0 = path1[j0]
+            r1 = path1[j1]
+            if swap_cost() < best_swap_cost:
+                best_swap_cost = swap_cost()
+                best_swap = (i0, i1, j0, j1)
+            r0 = path1[j1]
+            r1 = path1[j0]
+            if swap_cost() < best_swap_cost:
+                best_swap_cost = swap_cost()
+                best_swap = (i0, i1, j0, j1)
+    (i0, i1, j0, j1) = best_swap
+    
+    
+    if i1 == 0:
+        path = path0[1:i0+1]
+    else:
+        path = path0[:i0+1]
+    if j0 == 0 and j1 > 1:
+        path += path1
+    elif j0 > 1 and j1 == 0:
+        path += reversed(path1)    
+    elif j0 > j1:
+        path += path1[j0:]
+        path += path1[:j1+1]
+    else:
+        path += list(reversed(path1[:j0+1]))
+        path += list(reversed(path1[j1:]))
+    if i1 == 0:
+        path.append(path0[0])
+    else:
+        path += path0[i1:]
     if len(path) != len(path0) + len(path1):
         print("err", len(path), len(path0), len(path1))
         raise Exception("....")
