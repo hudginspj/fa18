@@ -6,40 +6,48 @@ import time
 from heldkarp import *
 from swap1 import *
 
-def ccw(A,B,C):
-    return (C[1]-A[1]) * (B[0]-A[0]) > (B[1]-A[1]) * (C[0]-A[0])
 
-# Return true if line segments AB and CD intersect
-def intersect(A,B,C,D):
-    return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
-
+def ccw(a,b,c):
+    return (c[1]-a[1]) * (b[0]-a[0]) > (b[1]-a[1]) * (c[0]-a[0])
 
 def is_inv(four_idx, all_cities):
     i0, i1, j0, j1 = four_idx
     a0, a1, b0, b1 = [all_cities[i] for i in four_idx]
     return ccw(a0,b0,b1) != ccw(a1,b0,b1) and ccw(a0,a1,b0) != ccw(a0,a1,b1)
-    # if a0[0] > a1[0]:
-    #     a1, a0 = a0, a1
-    # if b0[0] > b1[0]:
-    #     b1, b0 = b0, b1
-    # inv = True
-    # inv = inv and (a0[1] - b0[1]) * (a1[1] - b1[1]) < 0 # 
-    # # inv = inv and min(a0[0], a1[0]) < max(b0[0], 1[0])
-    # # inv = inv and min(a0[0], a1[0]) < max(b0[0], 1[0])
 
-    # return inv
 
 
 def show_inv(path, all_cities):
-    pass
+    for i in range(len(path)-3):
+        for j in range(i+2,len(path)-1):
+            four_idx = [path[k] for k in (i, i+1, j, j+1)]
+            if is_inv(four_idx, all_cities):
+                print(i, j)
+                plot_path(four_idx, all_cities, 'ro')
+                return
 
 
 def inv_test():
     cities = [[0,0], [0,1], [1,0], [1,1]]
     print(is_inv([0,3,1,2], cities))
 
+def inv_test2():
+    cities = gen_cities(24,500)
+    print("len cities", len(cities))
+
+    start_time = datetime.datetime.now()
+    path = one_swap(cities, cities)
+    runtime = (datetime.datetime.now() - start_time).total_seconds()
+    
+    distance = total_distance(cities, path)
+    print(distance)
+    show_inv(path, cities)
+
+    plot_path(path, cities, 'b')
+    plt.show()
+
 
 if __name__ == "__main__":
-    inv_test()
+    inv_test2()
     
 
