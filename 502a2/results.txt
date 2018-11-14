@@ -1,0 +1,35 @@
+
+
+
+----for 5000/1000:
+distance 34755.91608132473
+runtime 87.836355
+inversions:  287
+inversions:  13
+inversions:  0
+inversions:  7
+inversions:  0
+distance 32167.739979938917
+runtime 96.943399
+inversions:  47
+distance 31740.974605046773
+runtime 116.579505
+
+----5000/1000 again:
+distance 34512.57306955841
+runtime 84.045253
+inversions:  269
+inversions:  9
+inversions:  0
+inversions:  2
+inversions:  0
+distance 32333.374974446197
+runtime 93.088685
+inversions:  40
+inversions:  2
+inversions:  0
+distance 31910.805698623684
+runtime 117.188859
+
+
+
