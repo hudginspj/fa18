@@ -4,6 +4,7 @@ import os
 import datetime
 import time
 from swap1 import *
+from inv1 import *
 from mpi4py import MPI
 
 #print("hello")
@@ -45,8 +46,11 @@ def recursive_split(cities, all_cities, depth=0):
 
     if depth < 4:
         pass
-        print("  " * depth, len(cities), len(part0), len(path0), len(part1), len(path1))
+        print("  " * depth, rank, len(cities), len(part0), len(path0), len(part1), len(path1))
     path = swap(path0, path1, all_cities)
+    if depth == SPLIT_DEPTH:
+        path, inversions = fix_inv(path, cities, 200)
+        print("  " * depth, rank, "inversions")
 
     return path
 
@@ -69,7 +73,7 @@ SPLIT_DEPTH = 4
 if rank != 0:
     recursive_split_MPI()
 else:
-    n, runtime, distance = mpi_trial(1000)
+    n, runtime, distance = mpi_trial(5000)
     print((SPLIT_DEPTH, n, runtime, distance))
     
 

@@ -4,8 +4,8 @@ import datetime
 import time
 from multiprocessing import Process, Pipe
 from heldkarp import *
-import matplotlib.pyplot as plt
-import numpy as np
+# import matplotlib.pyplot as plt
+# import numpy as np
 
 def get_endpoints(points, n):
     #n = int(math.sqrt(len(points))) // 4
@@ -119,20 +119,14 @@ def swap_all(path0, path1, all_cities):
     return path
 
 def near_path_indexies(path0, path1, all_cities):
-    n_ideal = 200
+    n_ideal = 50
     n = max(len(path0), len(path1))
     if n < n_ideal:
         return range(len(path0)), range(len(path1))
     xs0 = [all_cities[i][0] for i in path0]
     min_x0 , max_x0 = min(xs0), max(xs0)
-    ys0 = [all_cities[i][1] for i in path0]
-    min_y0 , max_y0 = min(ys0), max(ys0)
     xs1 = [all_cities[i][0] for i in path1]
     min_x1 , max_x1 = min(xs1), max(xs1)
-    ys1 = [all_cities[i][1] for i in path1]
-    min_y1 , max_y1 = min(ys1), max(ys1)
-    # print(min_x0 , max_x0, min_x1 , max_x1)
-    # print(min_y0 , max_y0, min_y1 , max_y1)
 
     if max_x0 < min_x1:
         cutoff0 = max_x0 - ((n_ideal/n) * (max_x0-min_x0))
@@ -140,7 +134,12 @@ def near_path_indexies(path0, path1, all_cities):
         path0_indexes = [i for i in range(len(path0)) if all_cities[path0[i]][0] > cutoff0]
         path1_indexes = [i for i in range(len(path1)) if all_cities[path1[i]][0] < cutoff1]
         return path0_indexes, path1_indexes
-    elif max_y0 < min_y1:
+    
+    ys0 = [all_cities[i][1] for i in path0]
+    min_y0 , max_y0 = min(ys0), max(ys0)
+    ys1 = [all_cities[i][1] for i in path1]
+    min_y1 , max_y1 = min(ys1), max(ys1)
+    if max_y0 < min_y1:
         cutoff0 = max_y0 - ((n_ideal/n) * (max_y0-min_y0))
         cutoff1 = min_y1 + ((n_ideal/n) * (max_y1-min_y1))
         path0_indexes = [i for i in range(len(path0)) if all_cities[path0[i]][1] > cutoff0]

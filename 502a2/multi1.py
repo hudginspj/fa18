@@ -84,12 +84,14 @@ def inv_test3():
 
 
 def inv_test4():
-    cities = gen_cities(5000,500)
+    n = 500000
+    cities = gen_cities(n,500)
 
     start_time = datetime.datetime.now()
     path = threaded_tsp(cities)
     plot_path(path, cities, "r:")
     #plt.savefig("new_mp.png")
+    print("-- n=", n)
     distance = total_distance(cities, path)
     print("distance", distance)
     print("runtime", (datetime.datetime.now() - start_time).total_seconds())
@@ -107,6 +109,6 @@ def inv_test4():
 
 if __name__ == "__main__":
     #print(threaded_trial(5000))
-    inv_test3()
+    inv_test4()
     
 

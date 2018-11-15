@@ -1,5 +1,6 @@
 
-
+---5000 on project1: 
+(5000, 12.74425, 43188.41819388526)
 
 ----for 5000/1000:
 distance 34755.91608132473
@@ -58,3 +59,15 @@ inversions:  17
 inversions:  0
 distance 32647.27030220823
 runtime 43.173762
+
+---50k/100:
+distance 116671.84575947745
+runtime 102.32171
+inversions:  3993
+inversions:  339
+distance 106913.18362910395
+runtime 124.145195
+
+-- n= 500000
+distance 342706.114532395
+runtime 290.963212
