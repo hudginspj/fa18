@@ -49,7 +49,7 @@ def recursive_split(cities, all_cities, depth=0):
         print("  " * depth, rank, len(cities), len(part0), len(path0), len(part1), len(path1))
     path = swap(path0, path1, all_cities)
     if depth == SPLIT_DEPTH:
-        path, inversions = fix_inv(path, cities, 200)
+        path, inversions = fix_inv(path, all_cities, 200)
         print("  " * depth, rank, "inversions")
 
     return path

@@ -13,10 +13,7 @@ def ccw(a,b,c):
 
 def is_inv(four_idx, all_cities):
     i0, i1, j0, j1 = four_idx
-    try:
-        a0, a1, b0, b1 = [all_cities[i] for i in four_idx]
-    except:
-        print(i0, i1, j0, j1, all_cities)
+    a0, a1, b0, b1 = [all_cities[i] for i in four_idx]
     return ccw(a0,b0,b1) != ccw(a1,b0,b1) and ccw(a0,a1,b0) != ccw(a0,a1,b1)
 
 
