@@ -17,8 +17,8 @@ SPLIT_DEPTH = 1
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
-cartesian3d = comm.Create_cart(dims = [2,2,2],periods =[False,False,False],reorder=False)
-coord3d = cartesian3d.Get_coords(rank)
+# cartesian3d = comm.Create_cart(dims = [2,2,2],periods =[False,False,False],reorder=False)
+# coord3d = cartesian3d.Get_coords(rank)
 
 def get_time():
     return (datetime.datetime.now() - start_time).total_seconds()
