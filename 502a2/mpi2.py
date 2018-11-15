@@ -8,9 +8,20 @@ from mpi4py import MPI
 
 #print("hello")
 
+start_time = datetime.datetime.now()
+
+BLOCK_SIZE = 10
+SPLIT_DEPTH = 1
+# x_dim = 2^int(math.ceil(SPLIT_DEPTH/2.0))
+# y_dim = 2^int(math.floor(SPLIT_DEPTH/2.0))
+
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
+cartesian3d = comm.Create_cart(dims = [2,2,2],periods =[False,False,False],reorder=False)
+coord3d = cartesian3d.Get_coords(rank)
 
+def get_time():
+    return (datetime.datetime.now() - start_time).total_seconds()
 
 def recursive_split_MPI():
     cities, all_cities, depth = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG)
@@ -31,11 +42,14 @@ def recursive_split(cities, all_cities, depth=0):
 
     if depth <= SPLIT_DEPTH:
         sub_rank = rank + int(math.pow(2, depth))
+        print("  " * depth, rank, "sending to", sub_rank, get_time())
         comm.send((part0, all_cities, depth+1), dest=sub_rank, tag=11)
+        print("  " * depth, rank, "done sending to", sub_rank, get_time())
 
         path1 = recursive_split(part1, all_cities, depth+1)
 
         path0 = comm.recv(source=sub_rank, tag=MPI.ANY_TAG)
+        print("  " * depth, rank, "recieved from", sub_rank, get_time())
 
         
     else:
@@ -43,13 +57,14 @@ def recursive_split(cities, all_cities, depth=0):
         path1 = recursive_split(part1, all_cities, depth+1)
 
 
-    if depth < 4:
-        pass
-        print("  " * depth, rank, len(cities), len(part0), len(path0), len(part1), len(path1))
+    # if depth < 4:
+    #     pass
+    #     print("  " * depth, rank, len(cities), len(part0), len(path0), len(part1), len(path1))
     path = swap(path0, path1, all_cities)
     if depth == SPLIT_DEPTH:
+        print("  " * depth, rank, "starting inversions", get_time())
         path, inversions = fix_inv(path, all_cities, 200)
-        print("  " * depth, rank, "inversions")
+        print("  " * depth, rank, "done inversions", get_time())
 
     return path
 
@@ -60,15 +75,14 @@ def mpi_tsp(cities):
 def mpi_trial(n):
     cities = gen_cities(n,500)
 
-    start_time = datetime.datetime.now()
+    
     path = mpi_tsp(cities)
     runtime = (datetime.datetime.now() - start_time).total_seconds()
     
     distance = total_distance(cities, path)
     return n, runtime, distance
 
-BLOCK_SIZE = 10
-SPLIT_DEPTH = 4
+
 if rank != 0:
     recursive_split_MPI()
 else:

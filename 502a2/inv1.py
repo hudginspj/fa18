@@ -4,7 +4,7 @@ import os
 import datetime
 import time
 from heldkarp import *
-from swap1 import *
+from swap2 import *
 
 
 
@@ -42,7 +42,7 @@ def fix_inv(path, all_cities, limit=10):
                 #print(i, j, j-i)
                 path = path[:i+1] + list(reversed(path[i+1:j+1])) + path[j+1:]
                 count += 1
-    print("inversions: ", count)
+    #print("inversions: ", count)
     return path, count
 
 

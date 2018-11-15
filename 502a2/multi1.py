@@ -5,7 +5,6 @@ import datetime
 import time
 from multiprocessing import Process, Pipe
 from heldkarp import *
-from swap1 import *
 from inv1 import *
 
 def recursive_split_process(cities, depth, conn):
@@ -70,7 +69,7 @@ def inv_test3():
     distance = total_distance(cities, path)
     print("distance", distance)
     print("runtime", (datetime.datetime.now() - start_time).total_seconds())
-    plot_path(path, cities, "g:")
+    #plot_path(path, cities, "g:")
 
     path, inversions = fix_inv(path, cities, 5000)
     path, inversions = fix_inv(path, cities, 500)
@@ -78,33 +77,33 @@ def inv_test3():
     distance = total_distance(cities, path)
     print("distance", distance)
     print("runtime", (datetime.datetime.now() - start_time).total_seconds())
-    plot_path(path, cities, "b")
+    #plot_path(path, cities, "b")
 
-    plt.show()
+    #plt.show()
 
 
 def inv_test4():
-    n = 500000
+    n = 200000
     cities = gen_cities(n,500)
 
     start_time = datetime.datetime.now()
     path = threaded_tsp(cities)
-    plot_path(path, cities, "r:")
+    #plot_path(path, cities, "r:")
     #plt.savefig("new_mp.png")
     print("-- n=", n)
     distance = total_distance(cities, path)
     print("distance", distance)
     print("runtime", (datetime.datetime.now() - start_time).total_seconds())
 
-    path, inversions = fix_inv(path, cities, 200)
-    path, inversions = fix_inv(path, cities, 50)
+    path, inversions = fix_inv(path, cities, 100)
+    path, inversions = fix_inv(path, cities, 25)
     
     distance = total_distance(cities, path)
     print("distance", distance)
     print("runtime", (datetime.datetime.now() - start_time).total_seconds())
-    plot_path(path, cities, "b")
+    #plot_path(path, cities, "b")
 
-    plt.show()
+    #plt.show()
 
 
 if __name__ == "__main__":
