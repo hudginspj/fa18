@@ -5,7 +5,7 @@ import datetime
 import time
 from multiprocessing import Process, Pipe
 from heldkarp import *
-from inv1 import *
+from inversions import *
 
 def recursive_split_process(cities, depth, conn):
     #print("Starting ", os.getpid())
@@ -83,7 +83,7 @@ def inv_test3():
 
 
 def inv_test4():
-    n = 200000
+    n = 50000
     cities = gen_cities(n,500)
 
     start_time = datetime.datetime.now()
