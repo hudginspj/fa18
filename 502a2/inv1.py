@@ -16,9 +16,6 @@ def is_inv(four_idx, all_cities):
     a0, a1, b0, b1 = [all_cities[i] for i in four_idx]
     return ccw(a0,b0,b1) != ccw(a1,b0,b1) and ccw(a0,a1,b0) != ccw(a0,a1,b1)
 
-
-
-
 def show_inv(path, all_cities):
     for i in range(len(path)-3):
         for j in range(i+2,len(path)-1):

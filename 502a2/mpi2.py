@@ -11,14 +11,14 @@ from mpi4py import MPI
 start_time = datetime.datetime.now()
 
 BLOCK_SIZE = 10
-SPLIT_DEPTH = 1
-# x_dim = 2^int(math.ceil(SPLIT_DEPTH/2.0))
-# y_dim = 2^int(math.floor(SPLIT_DEPTH/2.0))
+SPLIT_DEPTH = 2
+x_dim = 2**int(math.ceil((SPLIT_DEPTH+1)/2.0))
+y_dim = 2**int(math.floor((SPLIT_DEPTH+1)/2.0))
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
-# cartesian3d = comm.Create_cart(dims = [2,2,2],periods =[False,False,False],reorder=False)
-# coord3d = cartesian3d.Get_coords(rank)
+cartesian = comm.Create_cart(dims = [x_dim,y_dim],periods =[False,False],reorder=False)
+coord = cartesian.Get_coords(rank)
 
 def get_time():
     return (datetime.datetime.now() - start_time).total_seconds()
@@ -61,7 +61,7 @@ def recursive_split(cities, all_cities, depth=0):
     #     pass
     #     print("  " * depth, rank, len(cities), len(part0), len(path0), len(part1), len(path1))
     path = swap(path0, path1, all_cities)
-    if depth == SPLIT_DEPTH:
+    if depth == SPLIT_DEPTH + 1:
         print("  " * depth, rank, "starting inversions", get_time())
         path, inversions = fix_inv(path, all_cities, 200)
         print("  " * depth, rank, "done inversions", get_time())
@@ -86,7 +86,7 @@ def mpi_trial(n):
 if rank != 0:
     recursive_split_MPI()
 else:
-    n, runtime, distance = mpi_trial(50000)
+    n, runtime, distance = mpi_trial(5000)
     print("-- mpi:")
     print((SPLIT_DEPTH, n, runtime, distance))
     

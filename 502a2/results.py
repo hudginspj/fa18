@@ -96,10 +96,21 @@ def gen_plot():
     # plt.grid(True)
     # plt.savefig("distance.png")
     # plt.show()
-    plt.loglog([t[0] for t in threaded],[t[1] for t in threaded])
+    p = [(500,10179), (5000,32178), (50000,106000), (500000,321000)]
+    
+    #p = [(,), (,), (,), (,), (,), (,), ]
+    p = [(1,96/96), (2,96/57), (4,96/31), (8,96/26), (16,96/16.6), (32,96/14.5)]
+    #p = [(500,1), (5000,12), (50000,96), (500000,1639)]
+    p = [(500,1/0.4), (5000,12/3.6), (50000,96/16.6), (500000,2639/199)]
+
+    plt.loglog([t[0] for t in p],[t[1] for t in p])
+    #plt.plot([t[0] for t in p],[t[1] for t in p])
     plt.xlabel('Num Cities')
-    plt.ylabel('Runtime (s)')
-    plt.title('Runtime, 32 processes')
+    #plt.xlabel('Num processes')
+    #plt.ylabel('Path length')
+    #plt.ylabel('Runtime (s)')
+    plt.ylabel('Speedup (s)')
+    #plt.title('Path length')
     plt.grid(True)
     plt.savefig("multi.png")
     plt.show()
