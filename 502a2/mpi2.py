@@ -12,13 +12,15 @@ start_time = datetime.datetime.now()
 
 BLOCK_SIZE = 10
 SPLIT_DEPTH = 2
-x_dim = 2**int(math.ceil((SPLIT_DEPTH+1)/2.0))
-y_dim = 2**int(math.floor((SPLIT_DEPTH+1)/2.0))
+
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
-cartesian = comm.Create_cart(dims = [x_dim,y_dim],periods =[False,False],reorder=False)
-coord = cartesian.Get_coords(rank)
+if SPLIT_DEPTH >= 1:
+    x_dim = 2**int(math.ceil((SPLIT_DEPTH+1)/2.0))
+    y_dim = 2**int(math.floor((SPLIT_DEPTH+1)/2.0))
+    cartesian = comm.Create_cart(dims = [x_dim,y_dim],periods =[False,False],reorder=False)
+    coord = cartesian.Get_coords(rank)
 
 def get_time():
     return (datetime.datetime.now() - start_time).total_seconds()
@@ -56,10 +58,6 @@ def recursive_split(cities, all_cities, depth=0):
         path0 = recursive_split(part0, all_cities, depth+1)
         path1 = recursive_split(part1, all_cities, depth+1)
 
-
-    # if depth < 4:
-    #     pass
-    #     print("  " * depth, rank, len(cities), len(part0), len(path0), len(part1), len(path1))
     path = swap(path0, path1, all_cities)
     if depth == SPLIT_DEPTH + 1:
         print("  " * depth, rank, "starting inversions", get_time())

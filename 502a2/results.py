@@ -101,7 +101,7 @@ def gen_plot():
     #p = [(,), (,), (,), (,), (,), (,), ]
     p = [(1,96/96), (2,96/57), (4,96/31), (8,96/26), (16,96/16.6), (32,96/14.5)]
     #p = [(500,1), (5000,12), (50000,96), (500000,1639)]
-    p = [(500,1/0.4), (5000,12/3.6), (50000,96/16.6), (500000,2639/199)]
+    p = [(50,0.2/0.1), (500,1/0.4), (5000,12/3.6), (50000,96/16.6), (500000,1639/199)]
 
     plt.loglog([t[0] for t in p],[t[1] for t in p])
     #plt.plot([t[0] for t in p],[t[1] for t in p])
@@ -113,7 +113,9 @@ def gen_plot():
     #plt.title('Path length')
     plt.grid(True)
     plt.savefig("multi.png")
+    print(p)
     plt.show()
+    
     # plt.plot([t[0] for t in exact],[t[1] for t in exact])
     # plt.xlabel('Num Cities')
     # plt.ylabel('Runtime (s)')
